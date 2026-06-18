@@ -1,121 +1,177 @@
-<p align="center">
-  <img src="vision.png" alt="Eye of Law Logo" width="180"/>
-</p>
-
-<h1 align="center">Eye of Law</h1>
-<p align="center"><strong>Adaptive Urban Traffic Intelligence & Decision-Support Platform</strong></p>
+<div align="center">
+  <img src="logo.png" alt="Eye of Law Logo" width="180"/>
+  
+  # Eye of Law
+  
+  *Autonomous Urban Traffic Enforcement & Decision-Support Command System.*
+  
+  [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+  [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+  [![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)](https://opencv.org/)
+  [![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+</div>
 
 ---
 
-## System Overview
+## Overview
 
-Eye of Law is an advanced, decision-support traffic enforcement platform designed for municipal traffic commissioners and transit authorities. The system processes traffic camera feeds and images to autonomously detect violations, recognize license plates via Optical Character Recognition (OCR), compute junction risk indexes, and recommend optimal enforcement patrol actions.
+**Eye of Law** is an end-to-end autonomous traffic intelligence and decision-support platform engineered for municipal traffic authorities and smart city hubs. By combining computer vision pipelines and deterministic heuristics, the platform processes traffic camera feeds to autonomously detect multiple infraction categories, perform localized license plate character recognition (OCR), rank junctions by real-time safety risk scores, and generate actionable natural language officer dispatch directives.
 
-The platform is divided into a robust Python FastAPI backend that runs computer vision algorithms and a dynamic Next.js React frontend providing real-time data visualization and operational command capabilities.
+The system replaces manual video monitoring with automated evidence generation, helping cities optimize officer deployments and enforce traffic compliance efficiently.
+
+---
+
+## Features
+
+* **Multi-Class Vehicle & Violation Detection**: Utilizes YOLOv8 and targeted geometric heuristics to detect helmet compliance, motorcycle triple-riding, seatbelt non-compliance, wrong-side driving, illegal parking, stop-line intrusion, red-light runs, and speeding.
+* **Multi-Pass License Plate OCR**: Integrates a robust OCR preprocessing pipeline (Otsu, Adaptive, Inverted, and Histogram Equalized treatments) with regex-based Indian registration format validation.
+* **Automated Prosecution Dossiers**: Dynamically compiles legally compliant PDF traffic citations using ReportLab, complete with unique transaction barcodes and side-by-side cropped evidence frames.
+* **Junction Risk Scoring Engine**: Calculates real-time intersection priority lists using infraction severity weights and active hourly surge multipliers.
+* **Explainable Dispatch Recommendations**: Interprets risk scores to output context-rich, natural language enforcement recommendations for transit dispatchers.
+* **Municipal Control Center UI**: Features GIS Leaflet location heatmaps, Recharts analytics, and searchable traffic records with inline license plate crop correction.
 
 ---
 
 ## System Architecture
 
-The following diagram illustrates the flow of data from raw sensors to active dispatch commands:
-
 ```mermaid
 graph TD
-    subgraph Traffic Ingestion Layer
-        A[Traffic Camera Media] -->|Upload / API Ingest| B(FastAPI: /api/upload)
-        C[Live Sensor Simulator] -->|Synthesized Feeds| D(FastAPI: /api/simulate)
+    subgraph Media Ingestion
+        A[Camera Stream / Media Upload] -->|Ingestion| B(FastAPI Endpoint)
     end
     
-    subgraph Computer Vision Pipeline
-        B --> E[YOLOv8 Detection Engine]
-        E -->|Vehicle & Pedestrian Bboxes| F[Violation Heuristics Classifier]
-        F -->|License Plate Localization| G[Modular OCR Wrapper]
-        G -->|Plate Text Extraction| H[Evidence Dossier Generator]
+    subgraph AI & Computer Vision Pipeline
+        B --> C[YOLOv8 Detection Core]
+        C -->|Vehicle & Person Coordinates| D[Infraction Heuristic Filters]
+        D -->|License Plate Region| E[Multi-Pass Preprocessing & OCR]
+        E -->|Recognized Characters| F[Dossier Compiler]
     end
     
-    subgraph Storage Layer
-        H -->|Annotated Frame & PDF Citation| I[(SQLite Database: violations)]
-        D -->|Simulated Infraction Logging| I
+    subgraph Data & Analytics Layer
+        F -->|Evidence Images & PDFs| G[(SQLite Database)]
+        G --> H[Risk Calculation Engine]
+        H -->|Junction Rankings| I[Recommendation Rules]
     end
     
-    subgraph Decision Intelligence Engine
-        I --> J[Risk Scoring Engine]
-        J -->|Junction Severity Index| K[Enforcement Recommendation Engine]
-        K -->|Dispatch Action Directives| L[FastAPI Command Feeds]
-    end
-    
-    subgraph Municipal Command Dashboard
-        L --> M[Next.js + Tailwind React Client]
-        M -->|Interactive GIS Maps| M
-        M -->|Recharts Real-time Analytics| M
-        M -->|Prosecution Dossier Downloads| M
+    subgraph Dashboard UI
+        I --> J[Next.js Interactive Dashboard]
+        J -->|Analytics Graphs & Live Map| Client[Traffic Operator]
     end
 ```
 
 ---
 
-## Core Features
+## Technology Stack
 
-1. **Computer Vision & Violation Heuristics**:
-   - **YOLOv8 Vehicle Detection**: Tracks cars, motorcycles, trucks, buses, and auto-rickshaws.
-   - **Helmet Compliance**: Heuristic verification analyzing bounding box overlaps between riders and helmets.
-   - **Triple Riding**: Identifies motorcycles carrying three or more overlapping individuals.
-   - **Seatbelt Compliance**: Analyzes occupant cabin structures using vehicle bounding box aspect ratios.
-   - **Illegal Parking**: Flags curbside blockages inside restricted spatial bounding zones.
-   - **Speeding**: Simulates radar calculations by estimating cross-frame velocity.
-
-2. **Automated Prosecution Documentation**:
-   - Generates composite **Evidence Card** images with bounding box highlights and license plate text.
-   - Compiles print-ready official **PDF Traffic Citations** utilizing ReportLab with custom tracking barcodes (EOL-TXN codes) and certified legal citations.
-
-3. **Traffic Risk Scoring Engine**:
-   - Computes dynamic risk indexes for urban junctions using localized infraction severity weights and short-term traffic volume multipliers:
-     $$RiskScore = \sum (OffenseCount \times SeverityWeight) \times BaseRisk \times TrendMultiplier$$
-   - Multiplies scoring weights up to 1.5x during surges in the past 24 hours relative to a weekly rolling average.
-
-4. **Explainable Enforcement Recommendations**:
-   - Evaluates real-time risk scores against automated dispatch rules.
-   - Outputs natural language guidelines explaining the rationale behind recommend-actions (e.g., "Deploy 2 helmet checkpoint officers to Silk Board Junction during morning peak hours due to a 42% rise in violations").
-
-5. **Decision-Support Command Dashboard**:
-   - **Control Room**: Ingest files, review live bounding box visualizers, perform manual plate adjustments, and download e-prosecution tickets.
-   - **Analytics Tab**: Access total violation indicators, peak hourly trend graphs, and infraction category distributions.
-   - **Location Heatmap**: Leaflet-powered GIS map overlaying junction indicators colored by local risk ratings.
-   - **Risk Rankings**: Priority queue of municipal intersections enabling direct officer dispatch command overrides.
+* **Frontend**: Next.js (TypeScript, TailwindCSS, Lucide Icons, Recharts, React Leaflet)
+* **Backend**: FastAPI (Python 3.10+, Uvicorn)
+* **AI/ML & CV**: OpenCV (Perspective Warp & CLAHE Filter), Ultralytics YOLOv8, PyTesseract OCR
+* **Database**: SQLite3 (Persistent relational SQL)
+* **Deployment**: Docker, Vercel
 
 ---
 
-## Installation and Setup
+## Workflow
+
+1. **Media Ingestion**: Operators upload a traffic camera image in the **Control Room** or trigger the real-time simulation stream.
+2. **OpenCV Preprocessing**: The system applies adaptive contrast stretching (CLAHE) and bilateral noise reduction filters to mitigate lighting and shadow artifacts.
+3. **Object Detection**: The frame is passed through YOLOv8 to localize and identify vehicles and individuals.
+4. **Heuristic Classification**: Geometric intersection and HSV color algorithms verify traffic violations (e.g., measuring head-area Hough circles for helmets, windshield diagonal edges for seatbelts, and taillight/headlight ratios for travel direction).
+5. **OCR Extraction**: License plates are cropped, perspective-corrected, and evaluated across multiple threshold treatments to isolate characters.
+6. **Prosecution Asset Generation**: The database saves the violation, writes a cropped image of the plate, compiles an official PDF citation ticket, and updates the command room priority queue.
+
+---
+
+## Screenshots
+
+*Placeholders for application dashboard view:*
+
+* **Executive Dashboard**: `[Insert screenshot of main Executive Analytics view showing Recharts and Leaflet Map here]`
+* **Control Room Ingestion**: `[Insert screenshot of Control Room showing bounding overlay visualizer and Ingestion Log Cards here]`
+* **Searchable Records**: `[Insert screenshot of Searchable Records showing license plate crops and PDF download buttons here]`
+
+---
+
+## Installation
 
 ### Prerequisites
-- Python 3.10 or higher
-- Node.js v18 or higher & NPM
+- Python 3.10+
+- Node.js v18+ & NPM
 - Tesseract OCR (Optional: installed and accessible in the system PATH for local OCR execution)
 
 ### 1. Backend API Service
-Navigate to the backend directory, install dependencies, and start the FastAPI server:
-
 ```bash
 cd backend
 pip install -r requirements.txt
-python run.py
 ```
-On startup, the system will verify the SQLite database state, seed 120+ historical violations if empty, and prepare static directories. The server runs at `http://localhost:8000`.
 
 ### 2. Frontend Command Client
-Navigate to the frontend directory, install dependencies, and start the Next.js development server:
-
 ```bash
 cd frontend
 npm install
-npm run dev
 ```
-The client dashboard runs at `http://localhost:3000`.
 
 ---
 
-## Verification & Execution Guide
-1. Launch both the backend API and frontend client development environments.
-2. Open `http://localhost:3000` in a web browser.
-3. Access the **Control Room** tab, select an image file, choose a target junction calibration, and click **Ingest Traffic Media**. Review the crop visualizer, annotated frames, and download the compiled PDF citation.
-4. Activate **Simulate Live Video** to verify real-time chart updates, Leaflet mapping markers, and priority queue ranking shifts.
+## Running the Project
+
+### Start Backend
+```bash
+cd backend
+python run.py
+```
+*The FastAPI server will start on `http://localhost:8000`. On startup, it automatically migrates the SQLite database schema and seeds historical records if the database is missing.*
+
+### Start Frontend
+```bash
+cd frontend
+npm run dev
+```
+*The Next.js client dashboard will start on `http://localhost:3000`.*
+
+---
+
+## Project Structure
+
+```
+├── backend/
+│   ├── app/
+│   │   ├── config.py          # Platform constants and junction coordinates
+│   │   ├── cv_engine.py       # YOLOv8 heuristics, OCR, and card generator
+│   │   ├── db.py              # SQLite connection, schemas, and Bangalore seed data
+│   │   ├── main.py            # FastAPI route controllers
+│   │   ├── models.py          # Pydantic schema validation structures
+│   │   └── pdf_generator.py   # ReportLab PDF citation layout configuration
+│   ├── run.py                 # FastAPI uvicorn execution entrypoint
+│   └── Dockerfile             # Container configuration for backend deployment
+├── frontend/
+│   ├── src/
+│   │   ├── components/        # Dynamic Leaflet Risk Map component
+│   │   └── app/
+│   │       ├── layout.tsx     # Global HTML/TypeScript structure
+│   │       └── page.tsx       # Unified Dashboard page code
+│   └── package.json           # Frontend dependencies
+├── logo.png                   # Centered project branding asset
+└── README.md                  # Hackathon documentation
+```
+
+---
+
+## Future Scope
+
+* **Video Stream Processing**: Transition from single-frame analysis to real-time RTSP video stream processing using multi-object tracking (ByteTrack).
+* **Automatic License Plate Reading (ALPR) Watchlists**: Integrate automated alerts that flag stolen, unregistered, or blacklisted vehicle plates instantly.
+* **Edge Deployment**: Optimize the YOLO models for deployment on edge devices like NVIDIA Jetson Nano modules on traffic poles.
+
+---
+
+## Team
+
+* **Aryan Shan** - *Lead Developer / Systems Engineer* - [GitHub Profile](https://github.com/Aryan-Shan)
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
