@@ -1,0 +1,53 @@
+# Python virtual environment and cache
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Backend runtime and models
+backend/traffic_intelligence.db
+backend/traffic_intelligence.db-journal
+backend/traffic_intelligence.db-wal
+backend/traffic_intelligence.db-shm
+backend/uploads/
+backend/yolov8n.pt
+backend/yolov8s.pt
+
+# Dynamically generated backend static files
+backend/static/evidence_card_*.jpg
+backend/static/citation_*.pdf
+backend/static/preprocessed_*.jpg
+backend/static/processed_*.jpg
+backend/static/upload_*.jpg
+backend/static/upload_demo_*.jpg
+backend/static/plate_*.jpg
+
+# Next.js and frontend dependencies
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+frontend/.env*.local
+
+# System/IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Architecture documentation (requested to not be pushed to git)
+Arcitecture.md

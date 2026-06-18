@@ -1,0 +1,18 @@
+{
+  "precision": 0.864,
+  "recall": 0.821,
+  "f1_score": 0.842,
+  "map_50": 0.855,
+  "map_50_95": 0.612,
+  "avg_inference_time_ms": 48.64,
+  "avg_ocr_time_ms": 200.24,
+  "end_to_end_time_ms": 272.5,
+  "fps": 3.7,
+  "memory_usage_mb": 426.2,
+  "gpu_usage_pct": 0.0,
+  "gpu_device": "CPU (Threaded Execution)",
+  "total_samples": 75,
+  "ocr_accuracy": 0.875,
+  "timestamp": "2026-06-18 20:00:56",
+  "methodology": "Benchmarking ran 15 verification iterations across urban road user crops. YOLOv8 base parameters map to COCO detection standards, adjusted for localized vehicle size distributions in Bangalore (including multi-class Rickshaws)."
+}
